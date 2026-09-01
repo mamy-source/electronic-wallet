@@ -61,19 +61,33 @@ Administrators can supervise users, wallets, transactions, and sensitive operati
 The project is organized as a monorepo using npm workspaces.
 
 ### Install dependencies
+```text 
 npm install
+```
 ### Run the web application
+```text 
 npm run dev:web
+```
 ### Run the API
+```text 
 npm run dev:api
+```
 ### Build the project
+```text 
 npm run build
+```
 ### Run tests
+```text 
 npm run test
+```
 ### Run lint
+```text 
 npm run lint
+```
 ### Run type checking
+```text 
 npm run typecheck
+```
 
 ## Status
 Project under development

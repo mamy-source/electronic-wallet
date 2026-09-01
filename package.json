@@ -2,6 +2,7 @@
   "name": "electronic_wallet",
   "version": "1.0.0",
   "description": "",
+  "private": "true",
   "main": "index.js",
   "workspaces": [
     "apps/*",
