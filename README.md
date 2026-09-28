@@ -1,26 +1,27 @@
 # electronic-wallet
 A web-based electronic wallet platform built with Next.js, Express.js, and TypeScript for managing wallets, transfers, payments, and transaction history.
 
-# Overview
+## Overview
 This project aims to design and develop a secure web-based electronic wallet platform that allows users to manage their wallets, perform financial operations, and track their transactions.
 
 Administrators can supervise users, wallets, transactions, and sensitive operations.
 
-# Main Features
-## User
+## Main Features
+
+### User
 - Account management
 - Wallet management
 - Wallet balance consultation
 - Money transfers
 - Payments
 - Transaction history
-## Administrator
+### Administrator
 - User supervision
 - Wallet supervision
 - Transaction supervision
 - Monitoring of sensitive operations
 
-# Tech Stack
+## Tech Stack
 - Next.js
 - Express.js
 - TypeScript
@@ -28,8 +29,9 @@ Administrators can supervise users, wallets, transactions, and sensitive operati
 - Database
 - Git & GitHub
 - Git Flow
-# Project Structure
-electronic-wallet/
+## Project Structure
+```text
+    electronic-wallet/
 ├── apps/
 │   ├── web/                # Next.js application
 │   └── api/                # Express.js API
@@ -52,25 +54,26 @@ electronic-wallet/
 ├── package.json
 ├── tsconfig.json
 └── .gitignore
+```
 
-# Development
+## Development
 
 The project is organized as a monorepo using npm workspaces.
 
-## Install dependencies
+### Install dependencies
 npm install
-## Run the web application
+### Run the web application
 npm run dev:web
-## Run the API
+### Run the API
 npm run dev:api
-## Build the project
+### Build the project
 npm run build
-## Run tests
+### Run tests
 npm run test
-## Run lint
+### Run lint
 npm run lint
-## Run type checking
+### Run type checking
 npm run typecheck
 
-# Status
+## Status
 Project under development
