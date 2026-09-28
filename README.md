@@ -7,14 +7,14 @@ This project aims to design and develop a secure web-based electronic wallet pla
 Administrators can supervise users, wallets, transactions, and sensitive operations.
 
 # Main Features
-# User
+## User
 - Account management
 - Wallet management
 - Wallet balance consultation
 - Money transfers
 - Payments
 - Transaction history
-# Administrator
+## Administrator
 - User supervision
 - Wallet supervision
 - Transaction supervision
@@ -57,19 +57,19 @@ electronic-wallet/
 
 The project is organized as a monorepo using npm workspaces.
 
-# Install dependencies
+## Install dependencies
 npm install
-# Run the web application
+## Run the web application
 npm run dev:web
-# Run the API
+## Run the API
 npm run dev:api
-# Build the project
+## Build the project
 npm run build
-# Run tests
+## Run tests
 npm run test
-# Run lint
+## Run lint
 npm run lint
-# Run type checking
+## Run type checking
 npm run typecheck
 
 # Status
