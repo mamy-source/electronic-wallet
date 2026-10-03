@@ -9,6 +9,6 @@ const env = {
     database: process.env.DATABASE_URL,
     frontendUrl:
     process.env.FRONTEND_URL ?? "http://localhost:3000",
-
+    pepper: process.env.PASSSWORD_PEPPER ?? "default_pepper",
 }
 export default env;
