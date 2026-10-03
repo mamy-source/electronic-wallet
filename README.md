@@ -64,13 +64,9 @@ The project is organized as a monorepo using npm workspaces.
 ```text 
 npm install
 ```
-### Run the web application
+### Run the server of developpement
 ```text 
-npm run dev:web
-```
-### Run the API
-```text 
-npm run dev:api
+npm run dev
 ```
 ### Build the project
 ```text 
