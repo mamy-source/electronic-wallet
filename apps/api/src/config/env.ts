@@ -10,5 +10,9 @@ const env = {
     frontendUrl:
     process.env.FRONTEND_URL ?? "http://localhost:3000",
     pepper: process.env.PASSSWORD_PEPPER ?? "default_pepper",
+
+    // JWT
+    jwtSecret: process.env.JWT_SECRET ?? "default_jwt_secret",
+    jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? "1h",
 }
 export default env;
