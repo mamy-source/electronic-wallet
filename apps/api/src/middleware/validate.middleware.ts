@@ -2,6 +2,7 @@ import type { RequestHandler } from 'express';
 import type { ZodType } from 'zod';
 
 import { AppError } from '../errors/app-error.js';
+import { ERROR_CODES } from '../errors/error-code.js';
 
 export const validate = (
   schema: ZodType,
@@ -13,8 +14,7 @@ export const validate = (
       throw new AppError(
         'Validation failed',
         400,
-        true,
-        result.error.flatten().fieldErrors,
+        ERROR_CODES.VALIDATION_ERROR,
       );
     }
 
