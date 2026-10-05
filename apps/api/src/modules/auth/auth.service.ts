@@ -23,11 +23,13 @@ export class AuthService {
         const user = await this.userRepository.createWithProfile({
             email: data.email,
             password: hashedPassword,
-            firstName: data.fisrtName,
-            lastName: data.lastName,
-            ...(data.bio !== undefined && {
-                bio: data.bio,
-            })
+            profile: {
+                firstName: data.fisrtName,
+                lastName: data.lastName,
+                ...(data.bio !== undefined && {
+                    bio: data.bio,
+                })
+            }
         });
 
         const accesToken = generateAccessToken({

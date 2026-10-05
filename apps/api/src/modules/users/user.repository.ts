@@ -47,9 +47,11 @@ export class UserRepository {
 
     //create with profile
     async createWithProfile(data: CreateUserRepo & {
-        firstName: string;
-        lastName: string;
-        bio?: string;
+        profile: {
+            firstName: string;
+            lastName: string;
+            bio?: string;
+        }
     },
     ){
         return await prisma.user.create({
@@ -58,10 +60,10 @@ export class UserRepository {
                 password: data.password,
                 profile: {
                     create: {
-                        firstName: data.firstName,
-                        lastName: data.lastName,
-                        ...(data.bio !== undefined && {
-                            bio: data.bio,
+                        firstName: data.profile.firstName,
+                        lastName: data.profile.lastName,
+                        ...(data.profile.bio !== undefined && {
+                            bio: data.profile.bio,
                           }),
                     },
                 },
