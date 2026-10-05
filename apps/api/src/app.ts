@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express, { type Express } from 'express';
 
+import errorMiddleware from './errors/error.middleware.js';
 
 const app: Express = express();
 
@@ -18,5 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/health', (req, res) => {
     res.status(200).json({ success: true, message: 'API is healthy' });
 });
+
+// Use error middleware
+app.use(errorMiddleware);
 
 export default app;

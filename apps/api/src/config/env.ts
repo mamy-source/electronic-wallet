@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import type { SignOptions } from 'jsonwebtoken';
 
 
 dotenv.config();
@@ -12,7 +13,7 @@ const env = {
     pepper: process.env.PASSSWORD_PEPPER ?? "default_pepper",
 
     // JWT
-    jwtSecret: process.env.JWT_SECRET ?? "default_jwt_secret",
-    jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? "1h",
+    jwtSecret: process.env.JWT_SECRET as string,
+    jwtExpiresIn: process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"] || "1h",
 }
 export default env;

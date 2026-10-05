@@ -5,6 +5,8 @@ import verifyPassword from "../../libs/argon2.lib.js";
 import { UserRepository } from "../users/user.repository.js";
 
 import type { LoginUserDto, RegisterUserDto } from "./auth.type.js";
+import { AppError } from "../../errors/app-error.js";
+import { ERROR_CODES } from "../../errors/error-code.js";
 
 export class AuthService {
     constructor(private userRepository: UserRepository,) {}
@@ -13,7 +15,7 @@ export class AuthService {
     async register(data: RegisterUserDto) {
         const existingUser = await this.userRepository.findByEmail(data.email);
         if (existingUser) {
-            throw new Error("User already exists");
+            throw new AppError("User already exists", 409, ERROR_CODES.CONFLICT);
         }
 
         const hashedPassword = await hashPassword.hashPassword(data.password);
@@ -51,7 +53,7 @@ export class AuthService {
     async login(data: LoginUserDto){
         const user = await this.userRepository.findByEmail(data.email);
         if (!user) {
-            throw new Error("User not found");
+            throw new AppError("User not found", 404, ERROR_CODES.NOT_FOUND);
         }
 
         const isPasswordValid = await verifyPassword.verifyPassword(data.password, user.password);
