@@ -7,7 +7,7 @@ const getArgon2Config = () =>{
     const envName = env.nodeEnv as EnvName;
 
     const configs: Record<EnvName, {
-        type: number;
+        type: typeof argon2.argon2id;
         memoryCost: number;
         timeCost: number;
         parallelism: number;
@@ -76,7 +76,6 @@ const verifyPassword = async (password: string, hash: string): Promise<boolean> 
         console.error('Error verifying password:', error);
         throw new Error('Failed to verify password');
 
-        return false;
     }
 }
 
