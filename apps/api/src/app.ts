@@ -2,7 +2,7 @@ import cors from 'cors';
 import express, { type Express } from 'express';
 
 import authRouter from './modules/auth/auth.routes.js';
-
+import userRouter from './modules/users/user.route.js';
 
 
 import errorMiddleware from './errors/error.middleware.js';
@@ -21,6 +21,9 @@ app.use(express.urlencoded({ extended: true }));
 
 //auth
 app.use('/api/auth', authRouter);
+
+//users
+app.use('/api/users', userRouter);
 
 //Health check route
 app.get('/health', (req, res) => {
