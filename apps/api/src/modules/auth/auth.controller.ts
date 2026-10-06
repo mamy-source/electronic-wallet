@@ -11,6 +11,7 @@ export class AuthController {
         next: NextFunction
     ): Promise<void> {
         try {
+            console.log('📦 BODY REÇU:', JSON.stringify(req.body, null, 2));
             const result = await authService.register(req.body);
 
             sendCreated(

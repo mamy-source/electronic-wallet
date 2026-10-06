@@ -24,10 +24,10 @@ export class AuthService {
             email: data.email,
             password: hashedPassword,
             profile: {
-                firstName: data.fisrtName,
-                lastName: data.lastName,
-                ...(data.bio !== undefined && {
-                    bio: data.bio,
+                firstName: data.profile.firstName,
+                lastName: data.profile.lastName,
+                ...(data.profile.bio !== undefined && {
+                    bio: data.profile.bio,
                 })
             }
         });

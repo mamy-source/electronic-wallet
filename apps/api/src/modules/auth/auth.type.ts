@@ -1,9 +1,11 @@
 export interface RegisterUserDto {
     email: string;
     password: string;
-    fisrtName: string;
-    lastName: string;
-    bio?: string;
+    profile: {
+        firstName: string;
+        lastName: string;
+        bio?: string;
+    };
 }
 
 export interface LoginUserDto {

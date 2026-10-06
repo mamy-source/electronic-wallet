@@ -1,4 +1,24 @@
+import { create } from 'domain';
 import { prisma } from '../../config/prisma.js';
+import type { Prisma } from '../../generated/prisma/client.js';
+
+
+const userSelect = {
+    id: true,
+    email: true,
+    role: true,
+    createdAt: true,
+    updatedAt: true,
+    profile: {
+        select: {
+            firstName: true,
+            lastName: true,
+            bio: true,
+            createdAt: true,
+            updatedAt: true,
+        },
+    },
+}
 
 export interface CreateUserRepo {
     email: string;
@@ -71,6 +91,37 @@ export class UserRepository {
             include: {
                 profile: true,
             },
+        });
+    }
+
+    //find all users
+    async findAll() {
+        return await prisma.user.findMany({
+            select: userSelect,
+            orderBy: {
+                createdAt: 'desc',
+            }
+        });
+    }
+
+    //update user
+    async updateUser(id: string, data: Prisma.UserUpdateInput) {
+        return await prisma.user.update({
+            where: {
+                id,
+            },
+            data,
+            select: userSelect,
+        });
+    }
+
+    //delete user
+    async deleteUser(id: string) {
+        return await prisma.user.delete({
+            where: {
+                id,
+            },
+            select: userSelect,
         });
     }
 }
