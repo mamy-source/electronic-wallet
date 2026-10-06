@@ -1,3 +1,27 @@
+import type { Role } from '../../generated/prisma/client.js';
+
+declare global {
+  namespace Express {
+    interface User {
+      id: string;
+      email: string;
+      role: Role;
+      profile: {
+        id: string;
+        firstName: string;
+        lastName: string;
+        bio: string | null;
+      } | null;
+    }
+
+    interface Request {
+      user?: User;
+    }
+  }
+}
+
+export {};
+
 export interface RegisterUserDto {
     email: string;
     password: string;
