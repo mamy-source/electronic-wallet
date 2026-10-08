@@ -27,6 +27,7 @@ model User {
   role     Role   @default(USER)
 
   profile Profile?
+  refreshTokens RefreshToken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -47,4 +48,20 @@ model Profile {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
+}
+
+//model refreshToken
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash    String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revokeddAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+
+  @@index([userId])
+  @@index([expiresAt])
 }
