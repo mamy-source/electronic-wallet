@@ -87,3 +87,9 @@ npm run typecheck
 
 ## Status
 Project under development
+
+## Utilisation de l'IA
+
+L’IA est utilisée comme outil d’assistance au développement.
+
+[Voir la documentation sur l’utilisation de l’IA](./docs/AI_USAGE.md)
