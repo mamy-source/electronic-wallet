@@ -64,13 +64,9 @@ The project is organized as a monorepo using npm workspaces.
 ```text 
 npm install
 ```
-### Run the web application
+### Run the server of developpement
 ```text 
-npm run dev:web
-```
-### Run the API
-```text 
-npm run dev:api
+npm run dev
 ```
 ### Build the project
 ```text 
@@ -91,3 +87,9 @@ npm run typecheck
 
 ## Status
 Project under development
+
+## Utilisation de l'IA
+
+L’IA est utilisée comme outil d’assistance au développement.
+
+[Voir la documentation sur l’utilisation de l’IA](./docs/AI_USAGE.md)
