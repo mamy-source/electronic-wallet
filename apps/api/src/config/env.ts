@@ -20,6 +20,7 @@ const env = {
     // SMTP 
     smtpHost: process.env.SMTP_HOST as string,
     smtpPort: Number(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === "true" || false,
     emailFrom: process.env.EMAIL_FROM as string,
 }
 export default env;
