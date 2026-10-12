@@ -40,6 +40,27 @@ export class AuthController {
             next(error);
         }
     }
+
+    //log out
+    async logout(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const { refreshToken } =  req.body as {refreshToken: string;};
+
+            await authService.logout(refreshToken);
+
+            sendSuccess(
+                res,
+                null,
+                "User logged out successfully"
+            )
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export const authController = new AuthController();
