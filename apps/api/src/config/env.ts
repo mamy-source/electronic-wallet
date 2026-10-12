@@ -15,5 +15,11 @@ const env = {
     // JWT
     jwtSecret: process.env.JWT_SECRET as string,
     jwtExpiresIn: process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"] || "1h",
+
+
+    // SMTP 
+    smtpHost: process.env.SMTP_HOST as string,
+    smtpPort: Number(process.env.SMTP_PORT) || 587,
+    emailFrom: process.env.EMAIL_FROM as string,
 }
 export default env;
