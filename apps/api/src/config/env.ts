@@ -21,6 +21,15 @@ const env = {
     smtpHost: process.env.SMTP_HOST as string,
     smtpPort: Number(process.env.SMTP_PORT) || 587,
     secure: process.env.SMTP_SECURE === "true" || false,
-    emailFrom: process.env.EMAIL_FROM as string,
+    emailFrom: process.env.MAIL_FROM as string,
+
+    
 }
+
+console.log('SMTP CONFIG:', {
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: process.env.SMTP_SECURE,
+    from: process.env.MAIL_FROM,
+  });
 export default env;
