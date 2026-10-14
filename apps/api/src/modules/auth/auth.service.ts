@@ -12,6 +12,10 @@ import type { LoginUserDto, RegisterUserDto } from "./auth.type.js";
 import { AppError } from "../../errors/app-error.js";
 import { ERROR_CODES } from "../../errors/error-code.js";
 
+import { EmailVerificationService } from "./email-verification.service.js";
+
+const emailVerificationService = new EmailVerificationService;
+
 export class AuthService {
     constructor(private userRepository: UserRepository,) {}
 
@@ -35,6 +39,9 @@ export class AuthService {
                 })
             }
         });
+
+        // send verification email
+        await emailVerificationService.sendVerificationemail(user.id);
 
         const accesToken = generateAccessToken({
             sub: user.id,
@@ -64,7 +71,12 @@ export class AuthService {
 
         const isPasswordValid = await verifyPassword.verifyPassword(data.password, user.password);
         if (!isPasswordValid) {
-            throw new AppError("Invalid password", 401, ERROR_CODES.UNAUTHORIZED);
+            throw new AppError("Invalid password", 401, ERROR_CODES.INVALID_CREDENTIALS);
+        }
+
+        // Block login if email is not verified
+        if (!user.emailVerified) {
+            throw new AppError("Please verify your email before logging in", 403, ERROR_CODES.UNAUTHORIZED);
         }
 
         const accesToken = generateAccessToken({
