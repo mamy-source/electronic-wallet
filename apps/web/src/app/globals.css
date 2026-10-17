@@ -141,26 +141,72 @@
   --color-on-tertiary: #ffffff;
 }
 
-/* ============================================
-   Base layer
-   ============================================ */
-@layer base {
-  html,
-  body {
-    margin: 0;
-    padding: 0;
+/* ---------- Lettres animées ---------- */
+@keyframes hero-letter-in {
+  0% {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.96);
+    filter: blur(4px);
   }
-  body {
-    overscroll-behavior: none;
+  60% {
+    opacity: 1;
+    filter: blur(0);
   }
-  main > :first-child {
-    margin-top: 0 !important;
-  }
-  main > :last-child {
-    margin-bottom: 0 !important;
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
   }
 }
 
-::-webkit-scrollbar {
-  display: none;
+.hero-letter {
+  animation: hero-letter-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+/* ---------- DÉGRADÉ texte (mitohy amin'ny span rehetra) ---------- */
+.hero-gradient-text {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-primary, #2563eb),
+    var(--color-primary-container, #60a5fa),
+    var(--color-secondary, #a855f7),
+    var(--color-primary, #2563eb)
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: gradient-x 6s ease infinite;
+}
+
+/* Chaque lettre doit aussi être en mode "clip" pour que le dégradé suive */
+.hero-gradient-letter {
+  background-image: inherit;
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* ---------- Accessibilité ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .hero-letter,
+  .hero-gradient-text {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .hero-gradient-text,
+  .hero-gradient-letter {
+    background-image: linear-gradient(90deg, #2563eb, #60a5fa, #a855f7);
+  }
 }
