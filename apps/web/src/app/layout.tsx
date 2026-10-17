@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: "MONEXA Digital Wallet",
   description:
     "Instant mobile money transfers, secure multi-currency wallets, and merchant QR payments across Madagascar and beyond.",
+  icons: { icon: "/favicon.png" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
