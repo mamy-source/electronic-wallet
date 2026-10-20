@@ -4,7 +4,7 @@ import verifyPassword from "../../libs/argon2.lib.js";
 
 import { UserRepository } from "../users/user.repository.js";
 
-import type { LoginUserDto, RegisterUserDto } from "./auth.type.js";
+import type { LoginUserDto, RegisterUserDto } from "@electronic-wallet/shared";
 import { AppError } from "../../errors/app-error.js";
 import { ERROR_CODES } from "../../errors/error-code.js";
 

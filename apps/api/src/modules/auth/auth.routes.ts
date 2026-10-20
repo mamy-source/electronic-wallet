@@ -3,7 +3,7 @@ import { Router } from "express";
 import { authController } from "./auth.controller.js";
 import { validate } from "../../middleware/validate.middleware.js";
 
-import { loginSchema, registerSchema } from "./auth.schema.js";
+import { loginSchema, registerSchema } from "@electronic-wallet/validation"
 
 
 

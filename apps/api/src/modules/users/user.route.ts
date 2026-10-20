@@ -3,7 +3,7 @@ import { Router } from "express";
 import { userController } from "./user.controller.js";
 
 import { validate } from "../../middleware/validate.middleware.js";
-import { updateUserSchema } from "./user.schema.js";
+import { updateUserSchema } from "../../../../../packages/validation/auth/user.schema.js";
 
 import { protect, restrictTo } from "../auth/auth.middleware.js";
 
