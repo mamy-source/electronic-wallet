@@ -2,7 +2,7 @@ import { UserRepository } from "./user.repository.js";
 
 import { AppError } from "../../errors/app-error.js";
 import { ERROR_CODES } from "../../errors/error-code.js";
-import type { UpdatUserDto } from "./user.type.js";
+import type { UpdatUserDto } from "../../../../../packages/shared/src/types/user.type.js";
 
 export class UserService {
     constructor(private userRepository: UserRepository) {}

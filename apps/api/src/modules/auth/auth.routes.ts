@@ -3,10 +3,11 @@ import { Router } from "express";
 import { authController } from "./auth.controller.js";
 import { validate } from "../../middleware/validate.middleware.js";
 
-import { loginSchema, registerSchema, logoutSchema,
-    resendVerificationSchema, resetPasswordSchema,
-    verifyEmailSchema, forgotPasswordSchema
-} from "./auth.schema.js";
+import { loginSchema, registerSchema,
+     logoutSchema, verifyEmailSchema,
+     resendVerificationSchema, forgotPasswordSchema,
+     resetPasswordSchema 
+} from "@electronic-wallet/validation"
 
 import { emailVerificationController } from "./email-verification.controller.js";
 import { passwordResetController } from "./password-reset.controller.js";

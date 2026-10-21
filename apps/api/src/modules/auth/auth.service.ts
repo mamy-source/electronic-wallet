@@ -8,7 +8,7 @@ import { generateRefreshToken } from "../../libs/refresh-token.lib.js";
 import { refreshTokenRepository } from "./refresh-token.repository.js";
 
 
-import type { LoginUserDto, RegisterUserDto } from "./auth.type.js";
+import type { LoginUserDto, RegisterUserDto } from "@electronic-wallet/shared";
 import { AppError } from "../../errors/app-error.js";
 import { ERROR_CODES } from "../../errors/error-code.js";
 
