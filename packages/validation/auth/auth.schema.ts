@@ -43,7 +43,43 @@ export const loginSchema = z.object({
   password: z
     .string()
     .min(1, 'Password is required'),
+
 });
+
+export const logoutSchema = z.object({
+  refreshToken: z.string().min(1, 'Refresh token is required'),
+});
+
+
+export const verifyEmailSchema = z.object({
+  body: z.object({
+    token: z.string().min(1, 'Token is required'),
+  }),
+});
+
+export const resendVerificationSchema = z.object({
+  body: z.object({
+    email: z.email('Invalid email address'),
+  }),
+});
+
+export const forgotPasswordSchema = z.object({
+  body: z.object({
+    email: z.email('Invalid email address'),
+  }),
+});
+
+export const resetPasswordSchema = z.object({
+  body: z.object({
+    token: z.string().min(1, 'Token is required'),
+    newPassword: z
+      .string()
+      .min(8, 'Password must contain at least 8 characters')
+      .max(128, 'Password is too long'),
+  }),
+});
+
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type LogoutInput = z.infer<typeof logoutSchema>;
