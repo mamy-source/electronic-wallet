@@ -16,4 +16,5 @@ export  {
     LoginInput,
     RegisterInput,
     LogoutInput,
+    ForgotPasswordInput
   } from "./auth/auth.schema.js";
