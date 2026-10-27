@@ -13,6 +13,7 @@ export function useLogin() {
 
   return useMutation<AuthSession, Error, LoginUserDto>({
     mutationFn: authApi.login,
+    retry: false,
     onSuccess: (session) => {
       qc.setQueryData(authKeys.session(), session);
       const redirect = params.get("redirect") ?? "/wallet";

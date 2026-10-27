@@ -10,8 +10,10 @@ import { FormField } from "../FormField";
 import { SubmitButton } from "../SubmitButton";
 import { ServerError } from "../ServerError";
 import { FastLoginRow } from "./FastLoginRow";
-import { Logo } from "@/components/ui/Logo";
 import { Icon } from "@/components/ui/Icon";
+
+import type { LoginUserDto } from "@electronic-wallet/shared";
+import { ApiError } from "@/lib/api/api-error";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,9 +22,13 @@ export function LoginForm() {
   const {
     register,
     handleSubmit,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
+    mode: "onSubmit",
+    reValidateMode: "onChange",
     defaultValues: {
       email: "",
       password: "",
@@ -30,7 +36,48 @@ export function LoginForm() {
     },
   });
 
-  const onSubmit = (data: LoginInput) => mutate(data);
+  const onSubmit = (data: LoginInput) => {
+
+    clearErrors("root");
+
+    const payload: LoginUserDto = {
+      email: data.email,
+      password: data.password,
+    };
+
+
+    mutate(payload, {
+      onError: (error) => {
+        if (!(error instanceof ApiError)) {
+          setError("root.server", {message: "An unexpected error occurred."});
+          return;
+        }
+
+        // Backend field validation errors
+        if (error.fieldErrors?.email) {
+          setError("email", {
+            type: "server",
+            message: error.fieldErrors.email,
+          });
+        }
+        if (error.fieldErrors?.password) {
+          setError("password", {
+            type: "server",
+            message: error.fieldErrors.password,
+          });
+        }
+
+        // General API error
+        setError("root.server", {
+          type: "server",
+          message: error.message,
+        });
+      }
+    });
+
+  }
+  
+  
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>

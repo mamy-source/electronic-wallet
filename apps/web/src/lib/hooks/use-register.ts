@@ -17,6 +17,8 @@ export function useRegister() {
   >({
     mutationFn: authApi.register,
 
+    retry: false,
+
     onSuccess: ({ userId, requiresVerification }) => {
       if (requiresVerification) {
         router.push(

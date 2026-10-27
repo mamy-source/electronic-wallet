@@ -15,6 +15,8 @@ import {
 
 import { useRegister } from "@/lib/hooks/use-register";
 
+import { ApiError } from "@/lib/api/api-error";
+
 import { FormField } from "../FormField";
 import { SubmitButton } from "../SubmitButton";
 import { ServerError } from "../ServerError";
@@ -29,6 +31,8 @@ export function RegisterForm() {
     register,
     handleSubmit,
     control,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<RegisterFormInput>({
     resolver: zodResolver(registerFormSchema),
@@ -52,6 +56,8 @@ export function RegisterForm() {
   });
 
   const onSubmit = (data: RegisterFormInput) => {
+    clearErrors("root")
+
     const payload: RegisterUserDto = {
       email: data.email,
       password: data.password,
@@ -61,8 +67,44 @@ export function RegisterForm() {
       },
     };
 
-    mutate(payload);
+    mutate(payload, {
+      onError: (error) => {
+        if (!(error instanceof ApiError)) {
+          setError("root.server", {
+            message: "An unexpected error occurred."
+          });
+          return;
+        }
+
+        const fieldNames = [
+          "email",
+          "password",
+          "profile.firstName",
+          "profile.lastName",
+        ] as const;
+
+        const fieldErrors = error.fieldErrors;
+
+        if (fieldErrors) {
+          for (const field of fieldNames) {
+            const message = fieldErrors[field];
+
+            if (message) {
+              setError(field, {
+                type: "server",
+                message,
+              });
+            }
+          }
+        }
+
+        setError("root.server", {type: "server", message: error.message});
+
+      }
+    });
   };
+
+
 
   return (
     <form
@@ -71,7 +113,9 @@ export function RegisterForm() {
       noValidate
     >
       {/* Server error */}
-      <ServerError message={error?.message} />
+      {errors.root?.server?.message && (
+        <ServerError message={errors.root.server.message} />
+      )}
 
       {/* Personal information */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
