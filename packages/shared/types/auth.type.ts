@@ -69,3 +69,9 @@ export interface LoginUserDto {
 export interface ForgotPasswordDto {
   email: string
 }
+
+export interface ResetPasswordResponse {
+  success: true;
+  message: string;
+  requiresRelogin: boolean;
+}

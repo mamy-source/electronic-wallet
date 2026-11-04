@@ -8,7 +8,8 @@ export function AuthHeader() {
     <header className="w-full bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50">
       <div className="h-16 w-full px-4 sm:px-8 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Logo />
+          <a href="/">
+          <Logo /></a>
           <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant type-caption-micro">
             <Icon name="lock" className="text-[11px] text-primary" />
             <span className="text-[10px]">256-BIT TLS ENCRYPTED</span>

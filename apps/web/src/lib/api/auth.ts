@@ -6,26 +6,49 @@ import type {
   ForgotPasswordDto,
 } from "@electronic-wallet/shared";
 
-export interface AuthSession {
-  userId: string;
+import type { ResetPasswordInput } from "@electronic-wallet/validation";
+
+
+export interface AuthUser {
+  id: string;
   email: string;
   name: string;
   tier: string;
   requires2FA?: boolean;
+  role: "USER" | "ADMIN";
+  profile: {
+    id: string;
+    userId: string;
+    firstName: string;
+    lastName: string;
+    bio: string | null;
+  } | null;
+}
+
+export interface AuthSession {
+  accesToken: string;
+  refreshToken: string;
+  user: AuthUser;
 }
 
 export interface RecoveryResponse {
   message: string;
 }
 
+
 export const authApi = {
   login: async (input: LoginUserDto): Promise<AuthSession> => {
-    const { data } = await apiClient.post<AuthSession>(
+    const { data } = await apiClient.post<{
+      success: string;
+      message: string;
+      timestamp: string;
+      data: AuthSession;
+    }>(
       "/auth/login",
       input
     );
 
-    return data;
+    return data.data;
   },
 
   register: async (
@@ -52,4 +75,21 @@ export const authApi = {
 
     return data;
   },
+
+  resetPassword: async(
+    input: ResetPasswordInput
+  ): Promise<void> => {
+    await apiClient.post("auth/reset-password", input);
+  },
+
+  verifyEmail: async (token: string): Promise<void> => {
+    await apiClient.post("auth/verify-email", {
+      token,
+    });
+  },
+
+  logout: () => apiClient.post("/auth/logout").then(() => undefined),
+
+  me: () => apiClient.get<AuthSession>("/auth/me").then((r) => r.data)
 };
+

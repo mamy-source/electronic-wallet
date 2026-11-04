@@ -15,8 +15,10 @@ export function useLogin() {
     mutationFn: authApi.login,
     retry: false,
     onSuccess: (session) => {
+      // console.log("LOGIN SESSION:", session);
+      
       qc.setQueryData(authKeys.session(), session);
-      const redirect = params.get("redirect") ?? "/wallet";
+      const redirect = params.get("redirect") ?? "/";
       router.push(redirect);
       router.refresh();
     },

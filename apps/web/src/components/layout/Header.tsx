@@ -5,12 +5,17 @@ import { NAV_LINKS } from "@/lib/constants/navigation";
 import { ButtonLink } from "@/components/ui/Button";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { NavLink } from "./NavLink";
+import { UserMenu } from "./UserMenu";
 import { Icon } from "@/components/ui/Icon";
 import { Logo } from "../ui/Logo";
+import { useAuthUser } from "@/lib/hooks/use-auth-user";
+import { useRouter } from "next/navigation";
 
 export function Header() {
   const [activePath, setActivePath] = useState<string>("home");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, isLoading } = useAuthUser();
+  const router = useRouter();
 
   // Empêche le scroll du body quand le drawer est ouvert
   useEffect(() => {
@@ -25,14 +30,20 @@ export function Header() {
     setMobileOpen(false);
   };
 
+  const isAuthenticated = Boolean(user);
+
   return (
     <header className="fixed top-0 inset-x-0 z-50 bg-surface-container-lowest/85 backdrop-blur-xl border-b border-outline-variant/20">
       <div className="h-16 md:h-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 flex items-center justify-between gap-3 md:gap-6">
         {/* ---------- Left: Logo + Desktop Nav ---------- */}
         <div className="flex items-center gap-6 lg:gap-10 min-w-0">
           <a
-            href="#"
-            onClick={() => handleNavigate("home")}
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavigate("home");
+              router.push("/");
+            }}
             className="flex items-center gap-2 shrink-0 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
             aria-label="Accueil"
           >
@@ -67,34 +78,41 @@ export function Header() {
             <LanguageSwitcher />
           </div>
 
-          <ButtonLink
-            variant="ghost"
-            href="#"
-            className="hidden md:inline-flex"
-          >
-            Log In
-          </ButtonLink>
+          {/* ═══ RAHA TSY CONNECTÉ ═══ */}
+          {!isLoading && !isAuthenticated && (
+            <>
+              <ButtonLink
+                variant="ghost"
+                href="/login"
+                className="hidden md:inline-flex"
+              >
+                Log In
+              </ButtonLink>
 
-          <ButtonLink
-            variant="gradient"
-            href="#"
-            className="hidden sm:inline-flex"
-          >
-            Create Account
-          </ButtonLink>
+              <ButtonLink
+                variant="gradient"
+                href="/register"
+                className="hidden sm:inline-flex"
+              >
+                Create Account
+              </ButtonLink>
+            </>
+          )}
 
-          {/* Avatar — visible md+ */}
-          <button
-            type="button"
-            className="hidden md:inline-flex rounded-full ring-2 ring-surface-container-high hover:ring-primary/40 transition-all outline-none focus-visible:ring-primary"
-            aria-label="Profil utilisateur"
-          >
-            <img
-              alt=""
-              className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover"
-              src="https://lh3.googleusercontent.com/aida/AEtjO1V9jvGIWlvJdRouIZS7-nrHiGFtmBf-f5m9fO0WJ2tIiygoRDHJ3jQ_8UBYQEH6Zf370nnoixvIBMvARVYQIQWJLBLvWpuy3kZH7T_wnYCwmA6bRYWQb1HRK3fIdxoUg7x7E3txTouwZKadqg34JPZlxv8BopK8Ph7_XGnE02DGS0rjOhwffQ2yCi0zS1oZ7_hjr3nZt2D472iupiJmadRSt58p1vkwJ0eJzWLOHoaqYc9h4gdF_9D5rrDXIlmEd5iXLWrOwPTNDA"
-            />
-          </button>
+          {/* ═══ RAHA CONNECTÉ ═══ */}
+          {!isLoading && isAuthenticated && user && (
+            <div className="hidden md:block">
+              <UserMenu user={user} />
+            </div>
+          )}
+
+          {/* Skeleton kely raha mbola loading */}
+          {isLoading && (
+            <div className="hidden md:flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-surface-container animate-pulse" />
+              <div className="h-3 w-16 rounded bg-surface-container animate-pulse" />
+            </div>
+          )}
 
           {/* Burger — mobile/tablet */}
           <button
@@ -105,10 +123,7 @@ export function Header() {
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
           >
-            <Icon
-              name={mobileOpen ? "close" : "menu"}
-              className="w-5 h-5"
-            />
+            <Icon name={mobileOpen ? "close" : "menu"} className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -116,17 +131,17 @@ export function Header() {
       {/* ---------- Mobile drawer ---------- */}
       <div
         className={`lg:hidden fixed inset-0 top-16 md:top-20 z-40 transition-opacity duration-300 ${
-          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          mobileOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
         aria-hidden={!mobileOpen}
       >
-        {/* Overlay */}
         <div
           className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           onClick={() => setMobileOpen(false)}
         />
 
-        {/* Panel */}
         <div
           id="mobile-menu"
           className={`relative bg-surface-container-lowest border-t border-outline-variant/20 shadow-xl h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] overflow-y-auto transition-transform duration-300 ${
@@ -134,6 +149,23 @@ export function Header() {
           }`}
         >
           <div className="px-4 sm:px-6 py-5 flex flex-col gap-1">
+            {/* Identité connectée */}
+            {isAuthenticated && user && (
+              <div className="flex items-center gap-3 px-4 py-3 mb-2 rounded-xl bg-surface-container">
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-white type-label-md font-semibold uppercase">
+                  {user.profile?.firstName?.charAt(0) ?? user.email.charAt(0)}
+                </span>
+                <div className="min-w-0">
+                  <p className="type-label-sm font-semibold text-on-surface truncate">
+                    {user.profile?.firstName ?? user.email.split("@")[0]}
+                  </p>
+                  <p className="type-caption-micro text-on-surface-variant truncate">
+                    {user.email}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {NAV_LINKS.map((link) => (
               <a
                 key={link.path}
@@ -162,17 +194,92 @@ export function Header() {
               <LanguageSwitcher />
             </div>
 
+            {/* Actions mobile selon état auth */}
             <div className="flex flex-col gap-2 mt-4">
-              <ButtonLink variant="ghost" href="#" className="w-full justify-center">
-                Log In
-              </ButtonLink>
-              <ButtonLink variant="gradient" href="#" className="w-full justify-center">
-                Create Account
-              </ButtonLink>
+              {!isLoading && !isAuthenticated && (
+                <>
+                  <ButtonLink
+                    variant="ghost"
+                    href="/login"
+                    className="w-full justify-center"
+                  >
+                    Log In
+                  </ButtonLink>
+                  <ButtonLink
+                    variant="gradient"
+                    href="/register"
+                    className="w-full justify-center"
+                  >
+                    Create Account
+                  </ButtonLink>
+                </>
+              )}
+
+              {isAuthenticated && (
+                <>
+                  <MobileLink
+                    icon="account_circle"
+                    label="My Account"
+                    onClick={() => {
+                      setMobileOpen(false);
+                      router.push("/account");
+                    }}
+                  />
+                  <MobileLink
+                    icon="wallet"
+                    label="My Wallet"
+                    onClick={() => {
+                      setMobileOpen(false);
+                      router.push("/wallet");
+                    }}
+                  />
+                  <MobileLink
+                    icon="settings"
+                    label="Settings"
+                    onClick={() => {
+                      setMobileOpen(false);
+                      router.push("/settings");
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileOpen(false);
+                      // logout hook — afaka atao eto koa raha tianao
+                      router.push("/login");
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-xl text-base font-medium text-error hover:bg-error-container/50 transition-colors"
+                  >
+                    <Icon name="logout" className="w-5 h-5" />
+                    Sign out
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
       </div>
     </header>
+  );
+}
+
+function MobileLink({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: string;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full flex items-center gap-2 px-4 py-3 rounded-xl text-base font-medium text-on-surface hover:bg-surface-container-high/60 transition-colors"
+    >
+      <Icon name={icon} className="w-5 h-5" />
+      {label}
+    </button>
   );
 }
