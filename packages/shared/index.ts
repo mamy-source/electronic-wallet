@@ -3,4 +3,6 @@ export type {
     AuthUser,
     RegisterUserDto,
     LoginUserDto,
+    ForgotPasswordDto,
+    ResetPasswordResponse
   } from "./types/auth.type";
