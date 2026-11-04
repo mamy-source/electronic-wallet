@@ -19,3 +19,19 @@ export  {
     ForgotPasswordInput,
     ResetPasswordInput
   } from "./auth/auth.schema.js";
+
+  export {
+    otpCodeSchema,
+    challengeIdSchema,
+    enableTwoFactorSchema,
+    verifyTwoFactorSchema,
+    disableTwoFactorSchema,
+    resendTwoFactorCodeSchema,
+  } from './auth/two-factor.schema.js';
+  
+  export type {
+    EnableTwoFactorInput,
+    VerifyTwoFactorInput,
+    DisableTwoFactorInput,
+    ResendTwoFactorCodeInput,
+  } from './auth/two-factor.schema.js';
