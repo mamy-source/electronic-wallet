@@ -1,7 +1,5 @@
-import { create } from 'domain';
 import { prisma } from '../../config/prisma.js';
 import type { Prisma } from '../../generated/prisma/client.js';
-import { email } from 'zod';
 
 
 const userSelect = {
@@ -127,3 +125,5 @@ export class UserRepository {
         });
     }
 }
+
+export const userRepository = new UserRepository();
