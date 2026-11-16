@@ -32,27 +32,46 @@ export class AuthController {
         try {
           const result = await authService.login(req.body);
       
-          // Store refresh token in an HttpOnly cookie
-          res.cookie("refreshToken", result.refreshToken, {
-            httpOnly: true,
-            secure: env.nodeEnv === "production",
-            sameSite: "lax",
-            path: "/api/auth",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-          });
-      
-          // Remove refresh token from JSON response
-          const { refreshToken, ...safeResult } = result;
-      
           sendSuccess(
             res,
-            safeResult,
-            "User logged in successfully"
+            result,
+            "OTP verification required to complete login"
           );
         } catch (error) {
           next(error);
         }
       }
+    
+      // Verify OTP - Complete Login
+    async verifyTwoFactorLogin(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const result = await authService.verifyTwoFactorLogin(
+                req.body
+            );
+
+            const { refreshToken, ...responseData } = result;
+
+            // Store refresh token in an HttpOnly cookie
+            res.cookie("refreshToken", refreshToken, {
+                httpOnly: true,
+                secure: env.nodeEnv === "production",
+                sameSite: "lax",
+                path: "/api/auth",
+            });
+
+            sendSuccess(
+                res,
+                responseData,
+                "Two-factor authentication successful"
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
 
     // Logout
     async logout(

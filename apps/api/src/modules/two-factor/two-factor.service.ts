@@ -183,20 +183,6 @@ export class TwoFactorService {
     const settings =
       await this.repository.findSettingsByUserId(userId);
 
-    if (!settings?.enabled) {
-      throw new AppError(
-        'Two-factor authentication is not enabled.',
-        400,
-      );
-    }
-
-    if (settings.method !== TwoFactorAuthMethod.EMAIL) {
-      throw new AppError(
-        'The configured two-factor method is not supported.',
-        400,
-      );
-    }
-
     const user = await this.getUser(userId);
 
     const challenge = await this.createChallenge(
@@ -209,6 +195,7 @@ export class TwoFactorService {
       requiresTwoFactor: true,
       challengeId: challenge.challengeId,
       expiresInSeconds: challenge.expiresInSeconds,
+      resendAvailableInSeconds: challenge.resendAvailableInSeconds,
       maskedDestination: challenge.maskedDestination,
     };
   }
@@ -220,17 +207,29 @@ export class TwoFactorService {
    * after this method returns successfully.
    */
   async verifyLogin(
-    userId: string,
     input: VerifyTwoFactorDto,
-  ): Promise<TwoFactorVerifyResponse> {
-    await this.verifyAndComplete(
-      userId,
-      input.challengeId,
-      input.code,
-      TwoFactorPurpose.LOGIN,
-    );
+  ): Promise<{ userId: string }> {
+      const challenge = await this.repository.findCodeByChallengeId(
+          input.challengeId,
+      );
 
-    return { verified: true };
+      if (!challenge || challenge.purpose !== TwoFactorPurpose.LOGIN) {
+          throw new AppError(
+              "Invalid or expired verification challenge.",
+              400,
+          );
+      }
+
+      const userId = challenge.userId;
+
+      await this.verifyAndComplete(
+          userId,
+          input.challengeId,
+          input.code,
+          TwoFactorPurpose.LOGIN,
+      );
+
+      return { userId };
   }
   /**
    * Start the 2FA deactivation process.

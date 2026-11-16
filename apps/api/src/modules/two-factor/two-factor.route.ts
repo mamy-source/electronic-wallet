@@ -39,8 +39,8 @@ twoFactorRouter.get(
 twoFactorRouter.post(
   "/enable",
   protect,
-  // twoFactorLimiter,
-  // validate(enableTwoFactorSchema),
+  twoFactorLimiter,
+  validate(enableTwoFactorSchema),
   twoFactorController.enable,
 );
 

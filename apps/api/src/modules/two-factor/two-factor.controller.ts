@@ -3,6 +3,9 @@ import type { NextFunction, Request, Response } from "express";
 import { twoFactorService } from "./two-factor.service.js";
 
 import { sendCreated, sendSuccess } from "../../utils/response.js";
+import env from "../../config/env.js";
+
+import { authService } from "../auth/auth.service.js";
 
 import type {
   EnableTwoFactorDto,
@@ -11,13 +14,6 @@ import type {
   ResendTwoFactorCodeDto,
 } from "@electronic-wallet/shared";
 
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-  };
-}
 
 class TwoFactorController {
   /**
@@ -25,7 +21,7 @@ class TwoFactorController {
    * GET /two-factor/status
    */
   getStatus = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
@@ -45,7 +41,7 @@ class TwoFactorController {
    * POST /two-factor/enable
    */
   enable = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
@@ -73,7 +69,7 @@ class TwoFactorController {
    * POST /two-factor/verify-setup
    */
   verifySetup = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
@@ -93,36 +89,50 @@ class TwoFactorController {
    * Vérifier le code OTP lors du login.
    * POST /two-factor/login/verify
    */
+
   verifyLogin = async (
     req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
-    try {
-      const input = req.body as VerifyTwoFactorDto & {
-        userId: string;
-      };
+      try {
+          const input = req.body as VerifyTwoFactorDto;
 
-      const result = await twoFactorService.verifyLogin(
-        input.userId,
-        {
-          challengeId: input.challengeId,
-          code: input.code,
-        },
-      );
+          // 1. Verify OTP
+          const { userId } = await twoFactorService.verifyLogin(input);
 
-      sendSuccess(res, result, "Two-factor verification successful.");
-    } catch (error) {
-      next(error);
-    }
+          // 2. Generate authentication tokens
+          const result = await authService.completeTwoFactorLogin(userId);
+
+          // 3. Store refresh token in HttpOnly cookie
+          res.cookie("refreshToken", result.refreshToken, {
+              httpOnly: true,
+              secure: env.nodeEnv === "production",
+              sameSite: "lax",
+              path: "/api/auth",
+              maxAge: 7 * 24 * 60 * 60 * 1000,
+          });
+
+          // 4. Remove refresh token from JSON response
+          const { refreshToken, ...safeResult } = result;
+
+          sendSuccess(
+              res,
+              safeResult,
+              "User authenticated successfully.",
+          );
+      } catch (error) {
+          next(error);
+      }
   };
+
 
   /**
    * Demander un code OTP pour désactiver le 2FA.
    * POST /two-factor/disable/challenge
    */
   requestDisableChallenge = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
@@ -146,7 +156,7 @@ class TwoFactorController {
    * POST /two-factor/disable
    */
   disable = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
@@ -170,7 +180,7 @@ class TwoFactorController {
    * POST /two-factor/resend
    */
   resendCode = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {

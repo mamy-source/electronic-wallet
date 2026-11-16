@@ -6,7 +6,7 @@ import { validate } from "../../middleware/validate.middleware.js";
 import { loginSchema, registerSchema,
      logoutSchema, verifyEmailSchema,
      resendVerificationSchema, forgotPasswordSchema,
-     resetPasswordSchema 
+     verifyTwoFactorSchema, resetPasswordSchema 
 } from "@electronic-wallet/validation"
 
 import { emailVerificationController } from "./email-verification.controller.js";
@@ -15,7 +15,8 @@ import { passwordResetController } from "./password-reset.controller.js";
 import {
     registerLimiter, loginLimiter,
     forgotPasswordLimiter, resendVerificationLimiter,
-    resetPasswordLimiter, verifyEmailLimiter 
+    resetPasswordLimiter, verifyEmailLimiter,
+    twoFactorLimiter, verifyTwoFactorLimiter
 } from "../../middleware/rate-limit.middleware.js";
 
 
@@ -42,6 +43,14 @@ authRouter.post('/verify-email',
     validate(verifyEmailSchema), 
 
     emailVerificationController.verifyEmail.bind(emailVerificationController));
+
+authRouter.post(
+    "/verify-2fa",
+    // verifyTwoFactorLimiter,
+    validate(verifyTwoFactorSchema),
+    authController.verifyTwoFactorLogin.bind(authController)
+);
+
 authRouter.post('/resend-verification', 
     resendVerificationLimiter, 
     validate(resendVerificationSchema), 

@@ -207,6 +207,25 @@ export class TwoFactorRepository {
     });
   }
 
+
+  /**
+   * Find a challenge using its ID.
+   *
+   * Used during login verification to retrieve the trusted userId.
+   */
+  async findCodeByChallengeId(challengeId: string) {
+    return prisma.twoFactorCode.findUnique({
+        where: {
+            id: challengeId,
+        },
+        select: {
+            userId: true,
+            purpose: true,
+        },
+    });
+  }
+
+
   /**
    * Increment the number of failed OTP attempts.
    *
@@ -366,14 +385,13 @@ export class TwoFactorRepository {
       // --------------------------------------------------------
 
       if (
-        purpose === TwoFactorPurpose.LOGIN ||
         purpose === TwoFactorPurpose.DISABLE
       ) {
         const settings = await tx.userTwoFactor.findUnique({
           where: { userId },
         });
 
-        if (!settings?.enabled) {
+        if (settings?.method !== challenge.channel) {
           return false;
         }
 
@@ -439,7 +457,7 @@ export class TwoFactorRepository {
         }
 
         case TwoFactorPurpose.LOGIN: {
-          await tx.userTwoFactor.update({
+          await tx.userTwoFactor.updateMany({
             where: { userId },
 
             data: {
