@@ -5,7 +5,7 @@ export type {
     LoginUserDto,
     ForgotPasswordDto,
     ResetPasswordResponse
-  } from "./types/auth.type";
+  } from "./types/auth.type.js";
 
   export type {
     TwoFactorMethod,
@@ -18,4 +18,6 @@ export type {
     TwoFactorChallengeResponse,
     TwoFactorLoginResponse,
     TwoFactorVerifyResponse,
-  } from './types/two-factor.types';
+  } from './types/two-factor.types.js';
+
+export type {UpdatUserDto} from "./types/user.type.js";

@@ -42,6 +42,7 @@ export interface TwoFactorLoginResponse {
   requiresTwoFactor: true;
   challengeId: string;
   expiresInSeconds: number;
+  resendAvailableInSeconds: number;
   maskedDestination: string;
 }
 
