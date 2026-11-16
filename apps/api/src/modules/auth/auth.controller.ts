@@ -73,6 +73,54 @@ export class AuthController {
         }
     }
 
+
+    // Refresh access token
+    async refresh(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const refreshToken = req.cookies?.refreshToken;
+
+            const result = await authService.refresh(refreshToken);
+
+            sendSuccess(
+                res,
+                result,
+                "Access token refreshed successfully"
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // Get currently authenticated user
+    async me(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            // req.user is populated by the protect middleware
+            if (!req.user) {
+                throw new Error("User is not authenticated");
+            }
+            const userId = req.user.id;
+
+            const result = await authService.me(userId);
+
+            sendSuccess(
+                res,
+                result,
+                "Authenticated user retrieved successfully"
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
     // Logout
     async logout(
         req: Request,

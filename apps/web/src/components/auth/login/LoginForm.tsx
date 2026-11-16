@@ -93,7 +93,7 @@ export function LoginForm() {
         </span>
       </div>
 
-      <ServerError message={error?.message} />
+      <ServerError message={errors.root?.server?.message ?? error?.message} />
 
       <FormField
         label="Email"

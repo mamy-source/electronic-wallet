@@ -1,49 +1,62 @@
+
 import { apiClient } from "./clients";
 
 import type {
   LoginUserDto,
   RegisterUserDto,
   ForgotPasswordDto,
+  VerifyTwoFactorDto,
 } from "@electronic-wallet/shared";
 
 import type { ResetPasswordInput } from "@electronic-wallet/validation";
 
-
+// User returned by the backend
 export interface AuthUser {
   id: string;
   email: string;
-  name: string;
-  tier: string;
-  requires2FA?: boolean;
   role: "USER" | "ADMIN";
   profile: {
     id: string;
-    userId: string;
     firstName: string;
     lastName: string;
     bio: string | null;
   } | null;
 }
 
+// Authentication session after successful OTP verification
 export interface AuthSession {
-  accesToken: string;
-  refreshToken: string;
+  accessToken: string;
   user: AuthUser;
+}
+
+// Login response before OTP verification
+export interface LoginChallenge {
+  requiresTwoFactor: true;
+  challengeId: string;
+  expiresInSeconds: number;
+  resendAvailableInSeconds: number;
+  maskedDestination: string;
+}
+
+export interface RefreshResponse {
+  accessToken: string;
 }
 
 export interface RecoveryResponse {
   message: string;
 }
 
+interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  timestamp: string;
+  data: T;
+}
 
 export const authApi = {
-  login: async (input: LoginUserDto): Promise<AuthSession> => {
-    const { data } = await apiClient.post<{
-      success: string;
-      message: string;
-      timestamp: string;
-      data: AuthSession;
-    }>(
+  // Login: email + password -> OTP challenge
+  login: async (input: LoginUserDto): Promise<LoginChallenge> => {
+    const { data } = await apiClient.post<ApiResponse<LoginChallenge>>(
       "/auth/login",
       input
     );
@@ -51,6 +64,28 @@ export const authApi = {
     return data.data;
   },
 
+  // Verify OTP -> complete authentication
+  verifyTwoFactor: async (
+    input: VerifyTwoFactorDto
+  ): Promise<AuthSession> => {
+    const { data } = await apiClient.post<ApiResponse<AuthSession>>(
+      "/auth/verify-2fa",
+      input
+    );
+
+    return data.data;
+  },
+
+  // Refresh access token using HttpOnly cookie
+  refresh: async (): Promise<RefreshResponse> => {
+    const { data } = await apiClient.post<ApiResponse<RefreshResponse>>(
+      "/auth/refresh"
+    );
+
+    return data.data;
+  },
+
+  // Register
   register: async (
     input: RegisterUserDto
   ): Promise<{
@@ -65,6 +100,7 @@ export const authApi = {
     return data;
   },
 
+  // Request password reset
   requestPasswordReset: async (
     input: ForgotPasswordDto
   ): Promise<RecoveryResponse> => {
@@ -76,20 +112,31 @@ export const authApi = {
     return data;
   },
 
-  resetPassword: async(
+  // Reset password
+  resetPassword: async (
     input: ResetPasswordInput
   ): Promise<void> => {
-    await apiClient.post("auth/reset-password", input);
+    await apiClient.post("/auth/reset-password", input);
   },
 
+  // Verify account email
   verifyEmail: async (token: string): Promise<void> => {
-    await apiClient.post("auth/verify-email", {
-      token,
-    });
+    await apiClient.post("/auth/verify-email", { token });
   },
 
-  logout: () => apiClient.post("/auth/logout").then(() => undefined),
+  // Logout
+  logout: async (): Promise<void> => {
+    await apiClient.post("/auth/logout");
+  },
 
-  me: () => apiClient.get<AuthSession>("/auth/me").then((r) => r.data)
+  // Get authenticated user
+  me: async (): Promise<{ user: AuthUser }> => {
+    const { data } = await apiClient.get<ApiResponse<AuthUser>>(
+      "/auth/me"
+    );
+
+    return {
+      user: data.data,
+    };
+  },
 };
-

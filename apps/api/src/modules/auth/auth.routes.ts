@@ -12,6 +12,8 @@ import { loginSchema, registerSchema,
 import { emailVerificationController } from "./email-verification.controller.js";
 import { passwordResetController } from "./password-reset.controller.js";
 
+import { protect } from "../auth/auth.middleware.js";
+
 import {
     registerLimiter, loginLimiter,
     forgotPasswordLimiter, resendVerificationLimiter,
@@ -46,7 +48,7 @@ authRouter.post('/verify-email',
 
 authRouter.post(
     "/verify-2fa",
-    // verifyTwoFactorLimiter,
+    verifyTwoFactorLimiter,
     validate(verifyTwoFactorSchema),
     authController.verifyTwoFactorLogin.bind(authController)
 );
@@ -66,5 +68,19 @@ authRouter.post('/reset-password',
     resetPasswordLimiter, 
     validate(resetPasswordSchema), 
     passwordResetController.resetPassword.bind(passwordResetController));
+
+
+// Refresh access token using HttpOnly cookie
+authRouter.post(
+    "/refresh",
+    authController.refresh.bind(authController)
+);
+
+// Get authenticated user
+authRouter.get(
+    "/me",
+    protect,
+    authController.me.bind(authController)
+);
 
 export default authRouter;

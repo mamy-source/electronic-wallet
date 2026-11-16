@@ -1,26 +1,28 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { authApi, type AuthSession } from "@/lib/api/auth";
-import { authKeys } from "@/lib/api/query-keys";
+
+import { authApi, type LoginChallenge } from "@/lib/api/auth";
 import type { LoginUserDto } from "@electronic-wallet/shared";
 
 export function useLogin() {
   const router = useRouter();
   const params = useSearchParams();
-  const qc = useQueryClient();
 
-  return useMutation<AuthSession, Error, LoginUserDto>({
+  return useMutation<LoginChallenge, Error, LoginUserDto>({
     mutationFn: authApi.login,
     retry: false,
-    onSuccess: (session) => {
-      // console.log("LOGIN SESSION:", session);
-      
-      qc.setQueryData(authKeys.session(), session);
+
+    onSuccess: (challenge) => {
       const redirect = params.get("redirect") ?? "/";
-      router.push(redirect);
-      router.refresh();
+
+      const searchParams = new URLSearchParams({
+        challengeId: challenge.challengeId,
+        redirect,
+      });
+
+      router.push(`/verify-2fa?${searchParams.toString()}`);
     },
   });
 }

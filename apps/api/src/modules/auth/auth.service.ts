@@ -182,6 +182,87 @@ export class AuthService {
         return this.completeTwoFactorLogin(userId);
     }
 
+
+    // Refresh access token using the HttpOnly refresh token
+    async refresh(refreshToken: string) {
+        // 1. Check refresh token presence
+        if (!refreshToken) {
+            throw new AppError(
+                "Refresh token is required",
+                401,
+                ERROR_CODES.UNAUTHORIZED
+            );
+        }
+
+        // 2. Hash the received refresh token
+        const tokenHash = hashRefreshToken(refreshToken);
+
+        // 3. Find an active and non-expired refresh token
+        const storedToken =
+            await refreshTokenRepository.findActiveByHash(tokenHash);
+
+        if (!storedToken) {
+            throw new AppError(
+                "Invalid or expired refresh token",
+                401,
+                ERROR_CODES.UNAUTHORIZED
+            );
+        }
+
+        // 4. Generate a new access token
+        const user = storedToken.user;
+
+        const accessToken = generateAccessToken({
+            sub: user.id,
+            email: user.email,
+            role: user.role,
+        });
+
+        // 5. Return the new access token
+        return {
+            accessToken,
+        };
+    }
+
+    // Get the currently authenticated user
+    async me(userId: string) {
+        // 1. Check authenticated user ID
+        if (!userId) {
+            throw new AppError(
+                "Authentication required",
+                401,
+                ERROR_CODES.UNAUTHORIZED
+            );
+        }
+
+        // 2. Find user by ID
+        const user = await this.userRepository.findById(userId);
+
+        if (!user) {
+            throw new AppError(
+                "User not found",
+                404,
+                ERROR_CODES.NOT_FOUND
+            );
+        }
+
+        // 3. Return safe user information
+        return {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            profile: user.profile
+                ? {
+                    id: user.profile.id,
+                    firstName: user.profile.firstName,
+                    lastName: user.profile.lastName,
+                    bio: user.profile.bio,
+                }
+                : null,
+        };
+    }
+
+
     
     //logout user
     async logout(refreshToken: string): Promise<void> {
