@@ -1,4 +1,3 @@
-import { create } from 'domain';
 import { prisma } from '../../config/prisma.js';
 import type { Prisma } from '../../generated/prisma/client.js';
 
@@ -7,6 +6,7 @@ const userSelect = {
     id: true,
     email: true,
     role: true,
+    emailVerified: true,
     createdAt: true,
     updatedAt: true,
     profile: {
@@ -18,7 +18,7 @@ const userSelect = {
             updatedAt: true,
         },
     },
-}
+} satisfies Prisma.UserSelect;
 
 export interface CreateUserRepo {
     email: string;
@@ -125,3 +125,5 @@ export class UserRepository {
         });
     }
 }
+
+export const userRepository = new UserRepository();

@@ -8,6 +8,7 @@ export const ERROR_CODES = {
   
     NOT_FOUND: 'NOT_FOUND',
     CONFLICT: 'CONFLICT',
+    BAD_REQUEST: 'BAD_REQUEST',
   
     INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
   } as const;

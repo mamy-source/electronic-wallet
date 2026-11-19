@@ -19,6 +19,17 @@ enum Role {
   ADMIN
 }
 
+enum TwoFactorAuthMethod {
+  SMS
+  EMAIL
+}
+
+enum TwoFactorPurpose {
+  SETUP
+  LOGIN
+  DISABLE
+}
+
 // model User
 model User {
   id       String @id @default(cuid())
@@ -26,7 +37,16 @@ model User {
   password String
   role     Role   @default(USER)
 
-  profile Profile?
+  profile       Profile?
+  refreshTokens RefreshToken[]
+
+  emailVerified           Boolean                  @default(false)
+  emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens     PasswordResetToken[]
+
+  twoFactor         UserTwoFactor?
+  twoFactorCodes    TwoFactorCode[]
+  twoFactorAttempts TwoFactorAttempt[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -47,4 +67,98 @@ model Profile {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
+}
+
+//model refreshToken
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+//model EmailVerificationToken
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Reset Password
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+//two factor auth
+model UserTwoFactor {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  method    TwoFactorAuthMethod @default(EMAIL)
+  enabled   Boolean  @default(false)
+  enabledAt DateTime?
+  lastUsedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TwoFactorCode {
+  id          String   @id @default(cuid())
+  userId      String
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  codeHash    String
+  purpose     TwoFactorPurpose
+  channel     TwoFactorAuthMethod
+
+  destination String
+
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(5)
+
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([userId, purpose, createdAt])
+  @@index([expiresAt])
+}
+
+model TwoFactorAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  success   Boolean
+  method    TwoFactorAuthMethod
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
