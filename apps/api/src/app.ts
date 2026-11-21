@@ -7,7 +7,14 @@ import userRouter from './modules/users/user.route.js';
 
 import errorMiddleware from './errors/error.middleware.js';
 
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger.js';
+
+
 const app: Express = express();
+
+//swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Enable cors for all rootes
 app.use(cors({
