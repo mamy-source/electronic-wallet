@@ -24,13 +24,16 @@ const env = {
     secure: process.env.SMTP_SECURE === "true" || false,
     emailFrom: process.env.MAIL_FROM as string,
 
+    //2FA
+    otpHashSecret: process.env.OTP_HASH_SECRET as string,
+
     
 }
 
-console.log('SMTP CONFIG:', {
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: process.env.SMTP_SECURE,
-    from: process.env.MAIL_FROM,
-  });
+// console.log('SMTP CONFIG:', {
+//     host: process.env.SMTP_HOST,
+//     port: process.env.SMTP_PORT,
+//     secure: process.env.SMTP_SECURE,
+//     from: process.env.MAIL_FROM,
+//   });
 export default env;
