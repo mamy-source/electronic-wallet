@@ -28,7 +28,7 @@ export class EmailVerificationService {
             expiresAt,
         });
 
-        const verificationLink = new URL('/api/auth/verify-email', env.apiUrl);
+        const verificationLink = new URL('/verify-email', env.frontendUrl);
         verificationLink.searchParams.set('token', token);
 
         await sendEmail({

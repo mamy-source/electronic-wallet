@@ -58,3 +58,31 @@ export const verifyEmailLimiter = createLimiter(
   10,
   'Too many verification attempts. Try again later.',
 );
+
+
+/**
+ * TWO-FACTOR AUTHENTICATION RATE LIMITERS
+ */
+
+// Limite les demandes d'activation et de challenge 2FA.
+export const twoFactorLimiter = createLimiter(
+  15 * 60 * 1000,
+  10,
+  "Too many two-factor authentication requests. Please try again later.",
+
+);
+
+// Limite les tentatives de vérification OTP.
+export const verifyTwoFactorLimiter = createLimiter(
+  15 * 60 * 1000,
+  5,
+ "Too many OTP verification attempts. Please try again later.",
+);
+
+// Limite les demandes de renvoi OTP.
+export const resendTwoFactorLimiter = createLimiter(
+  15 * 60 * 1000,
+  3,
+  "Too many OTP resend requests. Please try again later.",
+);
+

@@ -4,26 +4,22 @@ import { Router } from "express";
 import { authController } from "./auth.controller.js";
 import { validate } from "../../middleware/validate.middleware.js";
 
-import {
-  loginSchema,
-  registerSchema,
-  logoutSchema,
-  verifyEmailSchema,
-  resendVerificationSchema,
-  forgotPasswordSchema,
-  resetPasswordSchema,
-} from "@electronic-wallet/validation";
+import { loginSchema, registerSchema,
+     logoutSchema, verifyEmailSchema,
+     resendVerificationSchema, forgotPasswordSchema,
+     verifyTwoFactorSchema, resetPasswordSchema 
+} from "@electronic-wallet/validation"
 
 import { emailVerificationController } from "./email-verification.controller.js";
 import { passwordResetController } from "./password-reset.controller.js";
 
+import { protect } from "../auth/auth.middleware.js";
+
 import {
-  registerLimiter,
-  loginLimiter,
-  forgotPasswordLimiter,
-  resendVerificationLimiter,
-  resetPasswordLimiter,
-  verifyEmailLimiter,
+    registerLimiter, loginLimiter,
+    forgotPasswordLimiter, resendVerificationLimiter,
+    resetPasswordLimiter, verifyEmailLimiter,
+    twoFactorLimiter, verifyTwoFactorLimiter
 } from "../../middleware/rate-limit.middleware.js";
 
 const authRouter = Router();
@@ -321,6 +317,124 @@ authRouter.post(
   resetPasswordLimiter,
   validate(resetPasswordSchema),
   passwordResetController.resetPassword.bind(passwordResetController),
+);
+
+/**
+ * @openapi
+ * /auth/verify-2fa:
+ *   post:
+ *     summary: Verify two-factor authentication login
+ *     description: Verify the six-digit OTP code sent to the user's email to complete the login process.
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - challengeId
+ *               - code
+ *             properties:
+ *               challengeId:
+ *                 type: string
+ *                 example: "challenge_123456"
+ *               code:
+ *                 type: string
+ *                 pattern: '^[0-9]{6}$'
+ *                 example: "123456"
+ *     responses:
+ *       200:
+ *         description: Two-factor authentication successful. Access token returned and refresh token stored in an HttpOnly cookie.
+ *       400:
+ *         description: Invalid or expired verification code.
+ *       401:
+ *         description: Invalid authentication challenge.
+ *       429:
+ *         description: Too many verification attempts.
+ */
+authRouter.post(
+    "/verify-2fa",
+    verifyTwoFactorLimiter,
+    validate(verifyTwoFactorSchema),
+    authController.verifyTwoFactorLogin.bind(authController)
+);
+
+/**
+ * @openapi
+ * /auth/resend-verification:
+ *   post:
+ *     summary: Resend email verification
+ *     description: Send a new email verification link to the user's email address.
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: Verification email sent successfully.
+ *       400:
+ *         description: Invalid email address.
+ *       429:
+ *         description: Too many resend requests.
+ */
+authRouter.post('/resend-verification', 
+    resendVerificationLimiter, 
+    validate(resendVerificationSchema), 
+    emailVerificationController.resendVerification.bind(emailVerificationController)
+);
+
+/**
+ * @openapi
+ * /auth/refresh:
+ *   post:
+ *     summary: Refresh access token
+ *     description: Generate a new access token using the refresh token stored in an HttpOnly cookie.
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       200:
+ *         description: Access token refreshed successfully.
+ *       401:
+ *         description: Missing, invalid, expired, or revoked refresh token.
+ */
+authRouter.post(
+    "/refresh",
+    authController.refresh.bind(authController)
+);
+
+/**
+ * @openapi
+ * /auth/me:
+ *   get:
+ *     summary: Get authenticated user
+ *     description: Retrieve the profile and account information of the currently authenticated user.
+ *     tags:
+ *       - Authentication
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Authenticated user retrieved successfully.
+ *       401:
+ *         description: Authentication required or invalid access token.
+ */
+authRouter.get(
+    "/me",
+    protect,
+    authController.me.bind(authController)
 );
 
 export default authRouter;
